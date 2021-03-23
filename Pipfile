@@ -6,7 +6,12 @@ name = "pypi"
 [packages]
 envoy_reader = "*"
 prometheus_client = "*"
+ipython = "*"
 
 [dev-packages]
 ipython = "*"
 pytest = "*"
+
+[packages.e1839a8]
+path = "."
+editable = true

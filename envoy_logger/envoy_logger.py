@@ -38,6 +38,17 @@ while True:
         reader.lifetime_production(),
         reader.inverters_production(),
         return_exceptions=True))
+    # results:
+    # [13764,
+    # 28698,
+    # 642343,
+    # 4162674,
+    # {'202028033658': [120, '2021-03-11 11:30:02'],
+    #  '202029005102': [116, '2021-03-11 11:30:10'],
+    #  '202028035455': [120, '2021-03-11 11:30:18'],
+    #  '202029001566': [117, '2021-03-11 11:30:24'],
+    # ...
+
 
     #print("production:              {}".format(results[0]))
     #print("daily_production:        {}".format(results[1]))
