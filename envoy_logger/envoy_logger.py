@@ -3,6 +3,7 @@
 import asyncio
 import time
 import datetime
+import httpx
 from envoy_reader.envoy_reader import EnvoyReader
 from prometheus_client import start_http_server, Gauge
 
@@ -10,10 +11,10 @@ from prometheus_client import start_http_server, Gauge
 metric_prefix="envoy"
 port=9433
 
-#reader=EnvoyReader("envoy", "envoy", "058800", inverters=True)
+reader=EnvoyReader("envoy", "envoy", "058800", inverters=True)
 # Defaults to using envoy as the username and the last six of the
 # serial number as the password
-reader=EnvoyReader("envoy", inverters=True)
+#reader=EnvoyReader("envoy", inverters=True)
 
 
 production = Gauge(f"{metric_prefix}_production", "Current system power production (W)")
@@ -26,18 +27,19 @@ start_http_server(port)
 
 while True:
     loop = asyncio.get_event_loop()
-    dataResults = loop.run_until_complete(asyncio.gather(
-        reader.getData(), return_exceptions=True
-    ))
+    data_results = loop.run_until_complete(
+        asyncio.gather(
+            reader.getData(), return_exceptions=True))
 
     loop = asyncio.get_event_loop()
-    results = loop.run_until_complete(asyncio.gather(
-        reader.production(),
-        reader.daily_production(),
-        reader.seven_days_production(),
-        reader.lifetime_production(),
-        reader.inverters_production(),
-        return_exceptions=True))
+    results = loop.run_until_complete(
+        asyncio.gather(
+            reader.production(),
+            reader.daily_production(),
+            reader.seven_days_production(),
+            reader.lifetime_production(),
+            reader.inverters_production(),
+            return_exceptions=True))
     # results:
     # [13764,
     # 28698,
@@ -49,24 +51,22 @@ while True:
     #  '202029001566': [117, '2021-03-11 11:30:24'],
     # ...
 
+    try:
+        production.set(results[0])
+        daily_production.set(results[1])
+        seven_days_production.set(results[2])
+        lifetime_production.set(results[3])
 
-    #print("production:              {}".format(results[0]))
-    #print("daily_production:        {}".format(results[1]))
-    #print("seven_days_production:   {}".format(results[2]))
-    #print("lifetime_production:     {}".format(results[3]))
-    production.set(results[0])
-    daily_production.set(results[1])
-    seven_days_production.set(results[2])
-    lifetime_production.set(results[3])
-
-    if "401" in str(dataResults):
-        print("inverters_production:    Unable to retrieve inverter data - Authentication failure")
-    elif results[4] is None:
-        print("inverters_production:    Inverter data not available for your Envoy device.")
-    else:
-        for sn,status in results[4].items():
-            inverter.labels([sn]).set(status[0])
-            #print(f"{sn} {status[0]}")
+        if "401" in str(data_results):
+            print("inverters_production:    Unable to retrieve inverter data - Authentication failure")
+        elif results[4] is None:
+            print("inverters_production:    Inverter data not available from Envoy.")
+        else:
+            for sn,status in results[4].items():
+                inverter.labels([sn]).set(status[0])
+    except:
+        print("Error parsing results")
+        print(results)
 
     time.sleep(60)
 
