@@ -20,7 +20,7 @@ def main():
     if args.verbose:
         print(args)
     # As long as we have httpx 0.19 installed and use the explicit username/password, things seems to work
-    reader=EnvoyReader("envoy", "envoy", "058800", inverters=True)
+    reader=EnvoyReader("envoy.groot-iot", "envoy", "058800", inverters=True)
     # Defaults to using envoy as the username and the last six of the
     # serial number as the password
     #reader=EnvoyReader("envoy", inverters=True)
