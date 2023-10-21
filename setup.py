@@ -27,9 +27,8 @@ setup(
     include_package_data=True,
     python_requires=">=3.7.*",
     install_requires=[
-        'envoy_reader',
         'prometheus_client',
-        'httpx==0.19.0' # Requred till envoy_logger updates to use new httpx
+        'requests'
     ],
     license=about['__license__'],
     zip_safe=False,
