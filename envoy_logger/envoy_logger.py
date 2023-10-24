@@ -24,13 +24,13 @@ def parse_args():
     )
     parser.add_argument(
         "--user",
-        default=os.environ.get("envoy_user", ""),
-        help="username to use to obtain auth token. default taken from the envoy_user env var.",
+        default=os.environ.get("user", ""),
+        help="username to use to obtain auth token. default taken from the user env var.",
     )
     parser.add_argument(
         "--password",
-        default=os.environ.get("envoy_password", ""),
-        help="password to use to obtain auth token. default taken from the envoy_password env var.",
+        default=os.environ.get("password", ""),
+        help="password to use to obtain auth token. default taken from the password env var.",
     )
     parser.add_argument(
         "--serial",
@@ -39,7 +39,7 @@ def parse_args():
     )
     parser.add_argument(
         "--hostname",
-        default=os.environ.get("envoy_hostname", "envoy.local"),,
+        default=os.environ.get("hostname", "envoy.local"),
         help="hostname for the local envoy. default is taken from the envoy_hostname env var.",
     )
     args = parser.parse_args()
@@ -59,17 +59,20 @@ def get_web_token(args):
 
     envoy_token = os.environ.get("envoy_token", "")
     if envoy_token == "":
-        logger.info("Requesting web token.")
-        data = {"user[email]": args.user, "user[password]": args.password}
-        response = requests.post(login_url, data=data)
-        response_data = json.loads(response.text)
-        data = {
-            "session_id": response_data["session_id"],
-            "serial_num": args.envoy_serial,
-            "username": args.user,
-        }
-        response = requests.post(token_url, json=data)
-        envoy_token = response.text
+        if args.user != "" and args.password != "":
+            logger.info("Requesting web token.")
+            data = {"user[email]": args.user, "user[password]": args.password}
+            response = requests.post(login_url, data=data)
+            response_data = json.loads(response.text)
+            data = {
+                "session_id": response_data["session_id"],
+                "serial_num": args.serial,
+                "username": args.user,
+            }
+            response = requests.post(token_url, json=data)
+            envoy_token = response.text
+        else:
+            logger.info("user/password not defined.")
     else:
         logger.info("using envoy_token env var")
 
