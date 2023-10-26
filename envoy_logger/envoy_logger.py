@@ -34,7 +34,7 @@ def parse_args():
     )
     parser.add_argument(
         "--serial",
-        default=os.environ.get("envoy_serial", ""),
+        default=os.environ.get("serial", ""),
         help="envoy serial number to use to obtain auth token. default taken from the envoy_serial env var.",
     )
     parser.add_argument(

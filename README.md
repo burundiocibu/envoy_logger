@@ -8,7 +8,7 @@ pip install -e .
 
 docker build -t envoy_logger .
 
-docker run -e[user=$enphase_user,password=$enphase_password,serial=$envoy_serial] envoy_logger
+docker run -e user=$enphase_user -e password=$enphase_password -e serial=$envoy_serial -e hostname=envoy.groot-iot envoy_logger
 
 # Token Base auth
 https://enphase.com/download/accessing-iq-gateway-local-apis-or-local-ui-token-based-authentication
